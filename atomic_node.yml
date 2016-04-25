@@ -1,0 +1,72 @@
+---
+- name: Setup a Atomic OS Node
+  hosts: atomic_test_nodes
+  vars:
+    atomic_master: 192.168.3.10
+
+  tasks:
+  - name: Configuring Docker to use the cluster registry cache
+    lineinfile:
+      dest=/etc/sysconfig/docker
+      regexp='^OPTIONS='
+      line="OPTIONS='--registry-mirror=http://{{ atomic_master }}:5000 --selinux-enabled'"
+
+  - name: Configuring Docker to use the Flannel overlay
+    lineinfile:
+      dest=/etc/sysconfig/flanneld
+      regexp='^FLANNEL_ETCD='
+      line=FLANNEL_ETCD="http://192.168.3.10:2379"
+
+  - name: Set name of ETCD network
+    lineinfile:
+      dest=/etc/sysconfig/flanneld
+      regexp='^FLANNEL_ETCD_KEY='
+      line=FLANNEL_ETCD_KEY="/atomic01/network"
+
+  - name: Flanneld systemd directory
+    file: path=/etc/systemd/system/docker.service.d state=directory mode=0755
+
+  - name: Flanneld systemd unit file
+    copy:
+      src=files/10-flanneld-network.conf
+      dest=/etc/systemd/system/docker.service.d/10-flanneld-network.conf
+      owner=root
+      group=root
+      mode=0644
+
+  - name: Configuring Kubernetes nodes
+    lineinfile:
+      dest=/etc/kubernetes/kubelet
+      regexp='^KUBELET_ADDRESS='
+      line=KUBELET_ADDRESS="--address={{ ansible_eno16780032.ipv4.address }}"
+
+  - name: kubelet
+    lineinfile:
+      dest=/etc/kubernetes/kubelet
+      regexp='^KUBELET_HOSTNAME='
+      line=KUBELET_HOSTNAME="--address={{ ansible_eno16780032.ipv4.address }}"
+
+  - name: Kubelet API config
+    lineinfile:
+      dest=/etc/kubernetes/kubelet
+      regexp='^KUBELET_API_SERVER='
+      line=KUBELET_API_SERVER="--address={{ ansible_eno16780032.ipv4.address }}"
+
+  - name: Kubernetes config
+    lineinfile:
+      dest=/etc/kubernetes/config
+      regexp='^KUBE_MASTER='
+      line=KUBE_MASTER="--master=http://{{ atomic_master }}:8080"
+
+  - name: Reload systemd
+    command: /usr/bin/systemctl daemon-reload
+
+  - name: enable flanneld
+    service: name=flanneld enabled=yes
+  - name: enable kubelet
+    service: name=kubelet enabled=yes
+  - name: enable kube-proxy
+    service: name=kube-proxy enabled=yes
+
+  - name: SELinux allows Docker containers to read data over NFS by running the following command
+    command: /usr/sbin/setsebool -P virt_use_nfs 1
