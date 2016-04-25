@@ -1,5 +1,9 @@
-Ansible Playbook for Atomic Node configuration
-=====
+# Ansible Playbook for Atomic Node configuration
 
-Usage
------
+### Usage
+Replace
+```
+  vars:
+    atomic_master: 192.168.3.10
+```
+with your Kubernetes master address/hostname
