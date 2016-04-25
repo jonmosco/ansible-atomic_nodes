@@ -6,6 +6,10 @@ http://www.projectatomic.io/docs/gettingstarted/
 
 I will try to maintain this as the document gets updated.  Please feel free to submit pull requests
 
+### Requirements
+
+This playbook has been tested with Ansible 1.9+
+
 ### Usage
 Create a hosts file to use for configuration of your Atomic host environment
 
