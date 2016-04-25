@@ -1,5 +1,11 @@
 # Ansible Playbook for Atomic Node configuration
 
+### About
+This follows Project Atomics getting started guide:
+http://www.projectatomic.io/docs/gettingstarted/
+
+I will try to maintain this as the document gets updated.  Please feel free to submit pull requests
+
 ### Usage
 Create a hosts file to use for configuration of your Atomic host environment
 
