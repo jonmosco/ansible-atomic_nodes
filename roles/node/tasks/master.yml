@@ -3,6 +3,13 @@
   hosts: atomic_test_nodes
 
   tasks:
+  - name: Create the local Docker registry
+    docker:
+      name: local-registry
+
+  - name: Change the SELinux context on the directory that docker created for our persistence volume.
+    command: /usr/bin/chcon -Rvt svirt_sandbox_file_t /var/lib/local-registry
+
   - name: Local Docker registry systemd unit file
     copy:
       src=files/local-registry.service
@@ -11,8 +18,14 @@
       group=root
       mode=0644
 
-  - name: ETCD Server
+  - name: ETCD Server interface config
     lineinfile:
       dest=/etc/etcd/etcd.conf
       regexp='ETCD_LISTEN_CLIENT_URLS='
       line=ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379,http://0.0.0.0:4001"
+
+  - name: ETCD Server advertise config
+    lineinfile:
+      dest=/etc/etcd/etcd.conf
+      regexp='ETCD_ADVERTISE_CLIENT_URLS='
+      line=ETCD_ADVERTISE_CLIENT_URLS="http://0.0.0.0:2379,http://0.0.0.0:4001"
