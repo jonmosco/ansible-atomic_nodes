@@ -1,4 +1,4 @@
-# Ansible role for Atomic Cluster configuration and deplpyment
+# Ansible role for Atomic Cluster configuration and deployment
 
 ### About
 This follows Project Atomics getting started guide:
