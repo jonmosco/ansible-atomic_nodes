@@ -1,4 +1,4 @@
-# Ansible Playbook for Atomic Node configuration
+# Ansible role for Atomic Cluster configuration and deplpyment
 
 ### About
 This follows Project Atomics getting started guide:
@@ -15,8 +15,8 @@ Create a hosts file to use for configuration of your Atomic host environment
 
 Replace
 ```
-  vars:
-    atomic_master: 192.168.3.10
+vars:
+  atomic_master: 192.168.3.10
 ```
 with your Kubernetes master address/hostname
 
