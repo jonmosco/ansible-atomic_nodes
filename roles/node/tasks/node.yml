@@ -1,8 +1,6 @@
 ---
-- name: Setup a Atomic OS Node
+- name: Setup an Atomic OS Node
   hosts: atomic_test_nodes
-  vars:
-    atomic_master: 192.168.3.10
 
   tasks:
   - name: Configuring Docker to use the cluster registry cache
