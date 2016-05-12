@@ -2,4 +2,4 @@
 vars:
   atomic_master: 192.168.3.10
   etcd_master: 192.168.3.10
-  primary_interface: eno16780032
+  primary_interface: ansible_ifname

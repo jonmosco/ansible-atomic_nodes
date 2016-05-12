@@ -1,0 +1,11 @@
+---
+- hosts: master
+  roles:
+    - role: master
+- hosts: node01
+  roles:
+    - role: node
+  vars:
+    primary_interface: "{{ ansible_enp0s8.ipv4.address }}"
+    atomic_master: 192.168.3.10
+    etcd_master: 192.168.3.10

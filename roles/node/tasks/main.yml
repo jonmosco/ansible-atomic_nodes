@@ -45,19 +45,19 @@
   lineinfile:
     dest=/etc/kubernetes/kubelet
     regexp='^KUBELET_ADDRESS='
-    line=KUBELET_ADDRESS="--address={{ primary_interface.ipv4.address }}"
+    line=KUBELET_ADDRESS="--address={{ primary_interface }}"
 
 - name: kubelet
   lineinfile:
     dest=/etc/kubernetes/kubelet
     regexp='^KUBELET_HOSTNAME='
-    line=KUBELET_HOSTNAME="--address={{ primary_interface.ipv4.address }}"
+    line=KUBELET_HOSTNAME="--address={{ primary_interface }}"
 
 - name: Kubelet API config
   lineinfile:
     dest=/etc/kubernetes/kubelet
     regexp='^KUBELET_API_SERVER='
-    line=KUBELET_API_SERVER="--address={{ primary_interface.ipv4.address }}"
+    line=KUBELET_API_SERVER="--address={{ primary_interface }}"
 
 - name: Kubernetes config
   lineinfile:

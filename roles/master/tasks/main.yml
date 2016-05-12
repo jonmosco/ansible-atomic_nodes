@@ -12,10 +12,17 @@
                 state=started
   sudo: false
 
-notify:
 - name: Create the local Docker registry
   docker:
     name: local-registry
+    image: "registry:2"
+    ports:
+      - "5000:5000"
+    volumes:
+      - /var/lib/local-registry:/var/lib/registry
+    env:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+      REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
 
 - name: Change the SELinux context on the directory that docker created for our persistence volume.
   command: /usr/bin/chcon -Rvt svirt_sandbox_file_t /var/lib/local-registry
@@ -28,6 +35,12 @@ notify:
     group=root
     mode=0644
 
+- name: Reload systemd daemon and start the new local-registry service
+  command: /usr/bin/systemctl daemon-reload
+
+- name: enable local-registry
+  service: name=local-registry enabled=yes state=started
+
 - name: ETCD Server interface config
   lineinfile:
     dest=/etc/etcd/etcd.conf
@@ -39,3 +52,52 @@ notify:
     dest=/etc/etcd/etcd.conf
     regexp='ETCD_ADVERTISE_CLIENT_URLS='
     line=ETCD_ADVERTISE_CLIENT_URLS="http://0.0.0.0:2379,http://0.0.0.0:4001"
+
+- name: Kubernetes etcd config
+  lineinfile:
+    dest=/etc/kubernetes/config
+    regexp='^KUBE_ETCD_SERVERS='
+    line=KUBE_ETCD_SERVERS="--etcd_servers=http://{{ etcd_master }}:2379"
+
+- name: Kubernetes config
+  lineinfile:
+    dest=/etc/kubernetes/config
+    regexp='^KUBE_MASTER='
+    line=KUBE_MASTER="--master=http://{{ atomic_master }}:8080"
+
+- name: Kubernetes API Service config
+  lineinfile:
+    dest=/etc/kubernetes/apiserver
+    regexp='^KUBE_API_ADDRESS='
+    line=KUBE_API_ADDRESS="--address=0.0.0.0"
+
+- name: Kubernetes API ServiceAccount
+  lineinfile:
+    dest=/etc/kubernetes/apiserver
+    regexp='^KUBE_ADMISSION_CONTROL='
+    line=KUBE_ADMISSION_CONTROL="--admission_control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ResourceQuota"
+
+- name: enable and start etcd
+  service: name=etcd enabled=yes state=started
+
+- name: enable and start kube-apiserver
+  service: name=kube-apiserver enabled=yes state=started
+
+- name: enable and start kube-controller-manager
+  service: name=kube-controller-manager enabled=yes state=started
+
+- name: enable and start kube-scheduler
+  service: name=kube-scheduler enabled=yes state=started
+
+- name: Flanneld json configuration file
+  copy:
+    src=files/flannel-conf.json
+    dest=/tmp/flannel-conf.json
+    owner=root
+    group=root
+    mode=0644
+
+- name: Configure the Flannel overlay network
+  command: curl -L http://localhost:2379/v2/keys/atomic01/network/config -XPUT --data-urlencode value@flanneld-conf.json
+  args:
+    chdir: tmp/
