@@ -7,13 +7,15 @@ Vagrant.configure('2') do |config|
   # Atomic Master
   config.vm.define 'master' do |master|
     master.vm.box = 'centos/atomic-host'
-    master.vm.network :private_network, ip: "192.168.60.2"
+    master.vm.network "private_network", ip: "192.168.60.2",
+    virtualbox__intnet: true
   end
 
   # Atomic Node
   config.vm.define 'node01' do |node01|
     node01.vm.box = 'centos/atomic-host'
-    node01.vm.network :private_network, ip: "192.168.60.3"
+    node01.vm.network "private_network", ip: "192.168.60.3",
+    virtualbox__intnet: true
   end
 
    config.vm.provision "ansible" do |ansible|

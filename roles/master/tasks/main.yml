@@ -100,4 +100,4 @@
 - name: Configure the Flannel overlay network
   command: curl -L http://localhost:2379/v2/keys/atomic01/network/config -XPUT --data-urlencode value@flanneld-conf.json
   args:
-    chdir: tmp/
+    chdir: /tmp/
