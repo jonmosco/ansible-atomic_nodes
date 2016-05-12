@@ -6,21 +6,33 @@ http://www.projectatomic.io/docs/gettingstarted/
 
 I will try to maintain this as the document gets updated.  Please feel free to submit pull requests
 
+###Vagrant environment
+
+This repository contains a Vagrant environment as a test environment with one master, and one node,
+and more can be added easily.
+
+To change the IP Address of each Vagrant node, modify:
+```
+MASTER_IP="192.168.60.2"
+NODE01_IP="192.168.60.3"
+```
+
+In order to use the role with Vagrant, there is a site.yml in the top level directory.  Add the correct
+addresses from your Vagrant env in this file, and simply `vagrant up`
+
 ### Requirements
 
 This playbook has been tested with Ansible 1.9+
 
 ### Usage
-Create a hosts file to use for configuration of your Atomic host environment
 
-Replace
+Variables:
 ```
-vars:
-  atomic_master: 192.168.3.10
+  atomic_master:
+  etcd_master:
+  primary_interface:
 ```
-with your Kubernetes master address/hostname
 
-Substitute your primary network interface:
-```
-ansible_eno16780032.ipv4.address
-```
+###Bugs
+
+Please submit pull requests
