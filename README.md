@@ -26,12 +26,17 @@ This playbook has been tested with Ansible 1.9+
 
 ### Usage
 
-Variables:
-```
-  atomic_master:
-  etcd_master:
-  primary_interface:
-```
+###Variables:
+
+Address of the primary Atomic Master:
+* atomic_master:
+
+Address of ETCD master (same address as the Atomic Master in the docs):
+* etcd_master:
+
+Interface name of the externally available network adapter.  This is a variable
+because it can change based on underlying hardware:
+* primary_interface:
 
 ###Bugs
 
